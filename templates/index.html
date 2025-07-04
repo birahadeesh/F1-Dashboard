@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block title %}F1 Race Data Dashboard{% endblock %}
+
+{% block content %}
+<div class="track-bg"></div>
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="hero-title-container">
+            <div class="header-car left-car team-ferrari"></div>
+            <div class="racing-line"></div>
+            <h1 class="text-center display-4 fw-bold text-white">F1 Race Data Dashboard</h1>
+            <div class="racing-line"></div>
+            <div class="header-car right-car team-redbull"></div>
+        </div>
+        <p class="text-center text-white lead mb-4">View detailed race information from the 2024 F1 Season</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card shadow">
+            <div class="card-header d-flex justify-content-between align-items-center bg-dark text-white">
+                <h5 class="mb-0"><i class="fas fa-flag-checkered me-2"></i>Races</h5>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" id="sortDropdown"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        Sort By: {% if sort_by == 'name' %}Race Name{% else %}Race Number{% endif %}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sortDropdown">
+                        <li><a class="dropdown-item {% if sort_by == 'race_number' %}active{% endif %}"
+                                href="{{ url_for('dashboard', sort='race_number') }}">Race Number</a></li>
+                        <li><a class="dropdown-item {% if sort_by == 'name' %}active{% endif %}"
+                                href="{{ url_for('dashboard', sort='name') }}">Race Name</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row race-cards-container">
+                    {% for race in races %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 race-card shadow-sm" data-race-id="{{ race.id }}">
+                            <div class="card-img-top country-flag-container">
+                                <img src="{{ url_for('static', filename='img/flags/' + race.name.lower().replace(' ', '_') + '.jpg') }}"
+                                    alt="{{ race.name }} Flag" class="country-flag"
+                                    onerror="this.src='{{ url_for('static', filename='img/flags/' + race.name.lower().replace(' ', '_') + '.png') }}'; this.onerror='this.src=\'{{ url_for('static', filename='img/tracks/' + race.name.lower().replace(' ', '_') + '.jpg') }}'; this.onerror='this.src=\'{{ url_for('static', filename='img/f1_placeholder.jpg') }}\''" />
+                            </div>
+                            <div class="card-body">
+                                <div class="race-number">Round {{ race.race_number }}</div>
+                                <h5 class="card-title">{{ race.name }}</h5>
+                                <p class="card-text">
+                                    <i class="fas fa-map-marker-alt me-2"></i>{{ race.circuit_name }}<br>
+                                    <i class="fas fa-calendar-alt me-2"></i>
+                                    {% if race.date %}
+                                    {{ race.date.strftime('%B %d, %Y') }}
+                                    {% else %}
+                                    TBA
+                                    {% endif %}
+                                </p>
+                                <div class="btn-group w-100">
+                                    <a href="{{ url_for('race_details', race_id=race.id) }}" class="btn btn-primary">
+                                        <i class="fas fa-info-circle me-1"></i> Details
+                                    </a>
+                                    {% if current_user.is_authenticated %}
+                                    <button class="btn btn-outline-secondary favorite-btn" data-race-id="{{ race.id }}"
+                                        data-is-favorite="{{ '1' if race.id in favorites else '0' }}">
+                                        <i class="fas {{ 'fa-star' if race.id in favorites else 'fa-star-o' }}"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="race-card-overlay">
+                                <div class="racing-line"></div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mini cars at the bottom -->
+<div class="bottom-cars">
+    <div class="mini-f1-car team-mercedes"></div>
+    <div class="mini-f1-car team-mclaren"></div>
+    <div class="mini-f1-car team-ferrari"></div>
+</div>
+
+<!-- Add Racing Cars Animation -->
+<div class="race-track track-line-top"></div>
+<div class="race-track track-line-bottom"></div>
+
+<!-- Ferrari Car: Left to Right -->
+<div class="racing-car ferrari left-to-right">
+    <svg viewBox="0 0 1000 450" xmlns="http://www.w3.org/2000/svg">
+        <path class="car-body" d="M71.8,290.9c0,0-15.3-13.1,15.3-17.6l22.7-1.1c0,0,47.6-47.6,70.3-54.9s264.5-95.2,264.5-95.2
+        s169.3-85,183.5-61.1c0,0-25.6,1.7-33,6.8c0,0,90.9-35.2,113.6-35.2s223.4,161.9,223.4,161.9l7.4,78.6c0,0-22.7,11.4-22.7,21.6
+        c0,0-87.5-16.5-120.5-20.5s-81.3-1.5-81.3-1.5l-102.2-5.1L329.5,290l-100,19.3l-108.9-3.7c0,0-19.1,12.4-24.2,12.4
+        c-5.1,0-15.3-21.6-15.3-21.6L71.8,290.9z" fill="#e10600" />
+        <path class="car-wing" d="M223.9,217.1c-19.2,5.5-56.7,40.5-93.3,56.2S71.8,290.9,71.8,290.9l8.2,5.7c0,0,15.6,17.6,21.6,12.5
+        c0,0,102.2-1.7,161.3-25.6S329.5,258,329.5,258L223.9,217.1z" fill="#e10600" />
+        <path class="car-cockpit" d="M514.9,176.2l-5.7,27.3c0,0,0,33,12.5,41.8c5.4,3.8,36.3,15.9,47.6,15.9h78.8c2.1,0,9.1-1.1,10.2-5.7
+        c0,0,17.6-30.1,17.6-36.5s-11.7-56-11.7-56L514.9,176.2z" fill="#e10600" />
+        <circle class="wheel" cx="220" cy="300" r="32" fill="#1f1f1f" />
+        <circle class="wheel" cx="700" cy="300" r="32" fill="#1f1f1f" />
+    </svg>
+</div>
+
+<!-- Red Bull Car: Right to Left -->
+<div class="racing-car redbull right-to-left">
+    <svg viewBox="0 0 1000 450" xmlns="http://www.w3.org/2000/svg">
+        <path class="car-body" d="M71.8,290.9c0,0-15.3-13.1,15.3-17.6l22.7-1.1c0,0,47.6-47.6,70.3-54.9s264.5-95.2,264.5-95.2
+        s169.3-85,183.5-61.1c0,0-25.6,1.7-33,6.8c0,0,90.9-35.2,113.6-35.2s223.4,161.9,223.4,161.9l7.4,78.6c0,0-22.7,11.4-22.7,21.6
+        c0,0-87.5-16.5-120.5-20.5s-81.3-1.5-81.3-1.5l-102.2-5.1L329.5,290l-100,19.3l-108.9-3.7c0,0-19.1,12.4-24.2,12.4
+        c-5.1,0-15.3-21.6-15.3-21.6L71.8,290.9z" fill="#0600e1" />
+        <path class="car-wing" d="M223.9,217.1c-19.2,5.5-56.7,40.5-93.3,56.2S71.8,290.9,71.8,290.9l8.2,5.7c0,0,15.6,17.6,21.6,12.5
+        c0,0,102.2-1.7,161.3-25.6S329.5,258,329.5,258L223.9,217.1z" fill="#0600e1" />
+        <path class="car-cockpit" d="M514.9,176.2l-5.7,27.3c0,0,0,33,12.5,41.8c5.4,3.8,36.3,15.9,47.6,15.9h78.8c2.1,0,9.1-1.1,10.2-5.7
+        c0,0,17.6-30.1,17.6-36.5s-11.7-56-11.7-56L514.9,176.2z" fill="#0600e1" />
+        <circle class="wheel" cx="220" cy="300" r="32" fill="#1f1f1f" />
+        <circle class="wheel" cx="700" cy="300" r="32" fill="#1f1f1f" />
+    </svg>
+</div>
+
+<!-- Dashboard Car Section (after existing content) -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card shadow">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="fas fa-car me-2"></i>Team Performance</h5>
+            </div>
+            <div class="card-body">
+                <div class="dashboard-car-container">
+                    <div class="racing-car ferrari car-hover-effect">
+                        <svg viewBox="0 0 1000 450" xmlns="http://www.w3.org/2000/svg" style="height: 80px;">
+                            <path class="car-body" d="M71.8,290.9c0,0-15.3-13.1,15.3-17.6l22.7-1.1c0,0,47.6-47.6,70.3-54.9s264.5-95.2,264.5-95.2
+                            s169.3-85,183.5-61.1c0,0-25.6,1.7-33,6.8c0,0,90.9-35.2,113.6-35.2s223.4,161.9,223.4,161.9l7.4,78.6c0,0-22.7,11.4-22.7,21.6
+                            c0,0-87.5-16.5-120.5-20.5s-81.3-1.5-81.3-1.5l-102.2-5.1L329.5,290l-100,19.3l-108.9-3.7c0,0-19.1,12.4-24.2,12.4
+                            c-5.1,0-15.3-21.6-15.3-21.6L71.8,290.9z" fill="#e10600" />
+                            <path class="car-wing" d="M223.9,217.1c-19.2,5.5-56.7,40.5-93.3,56.2S71.8,290.9,71.8,290.9l8.2,5.7c0,0,15.6,17.6,21.6,12.5
+                            c0,0,102.2-1.7,161.3-25.6S329.5,258,329.5,258L223.9,217.1z" fill="#e10600" />
+                            <circle class="wheel" cx="220" cy="300" r="32" fill="#1f1f1f" />
+                            <circle class="wheel" cx="700" cy="300" r="32" fill="#1f1f1f" />
+                        </svg>
+                        <div class="team-name">Ferrari</div>
+                    </div>
+                    <div class="racing-car mercedes car-hover-effect">
+                        <svg viewBox="0 0 1000 450" xmlns="http://www.w3.org/2000/svg" style="height: 80px;">
+                            <path class="car-body" d="M71.8,290.9c0,0-15.3-13.1,15.3-17.6l22.7-1.1c0,0,47.6-47.6,70.3-54.9s264.5-95.2,264.5-95.2
+                            s169.3-85,183.5-61.1c0,0-25.6,1.7-33,6.8c0,0,90.9-35.2,113.6-35.2s223.4,161.9,223.4,161.9l7.4,78.6c0,0-22.7,11.4-22.7,21.6
+                            c0,0-87.5-16.5-120.5-20.5s-81.3-1.5-81.3-1.5l-102.2-5.1L329.5,290l-100,19.3l-108.9-3.7c0,0-19.1,12.4-24.2,12.4
+                            c-5.1,0-15.3-21.6-15.3-21.6L71.8,290.9z" fill="#6cd3bf" />
+                            <path class="car-wing" d="M223.9,217.1c-19.2,5.5-56.7,40.5-93.3,56.2S71.8,290.9,71.8,290.9l8.2,5.7c0,0,15.6,17.6,21.6,12.5
+                            c0,0,102.2-1.7,161.3-25.6S329.5,258,329.5,258L223.9,217.1z" fill="#6cd3bf" />
+                            <circle class="wheel" cx="220" cy="300" r="32" fill="#1f1f1f" />
+                            <circle class="wheel" cx="700" cy="300" r="32" fill="#1f1f1f" />
+                        </svg>
+                        <div class="team-name">Mercedes</div>
+                    </div>
+                    <div class="racing-car redbull car-hover-effect">
+                        <svg viewBox="0 0 1000 450" xmlns="http://www.w3.org/2000/svg" style="height: 80px;">
+                            <path class="car-body" d="M71.8,290.9c0,0-15.3-13.1,15.3-17.6l22.7-1.1c0,0,47.6-47.6,70.3-54.9s264.5-95.2,264.5-95.2
+                            s169.3-85,183.5-61.1c0,0-25.6,1.7-33,6.8c0,0,90.9-35.2,113.6-35.2s223.4,161.9,223.4,161.9l7.4,78.6c0,0-22.7,11.4-22.7,21.6
+                            c0,0-87.5-16.5-120.5-20.5s-81.3-1.5-81.3-1.5l-102.2-5.1L329.5,290l-100,19.3l-108.9-3.7c0,0-19.1,12.4-24.2,12.4
+                            c-5.1,0-15.3-21.6-15.3-21.6L71.8,290.9z" fill="#0600e1" />
+                            <path class="car-wing" d="M223.9,217.1c-19.2,5.5-56.7,40.5-93.3,56.2S71.8,290.9,71.8,290.9l8.2,5.7c0,0,15.6,17.6,21.6,12.5
+                            c0,0,102.2-1.7,161.3-25.6S329.5,258,329.5,258L223.9,217.1z" fill="#0600e1" />
+                            <circle class="wheel" cx="220" cy="300" r="32" fill="#1f1f1f" />
+                            <circle class="wheel" cx="700" cy="300" r="32" fill="#1f1f1f" />
+                        </svg>
+                        <div class="team-name">Red Bull</div>
+                    </div>
+                    <div class="racing-car mclaren car-hover-effect">
+                        <svg viewBox="0 0 1000 450" xmlns="http://www.w3.org/2000/svg" style="height: 80px;">
+                            <path class="car-body" d="M71.8,290.9c0,0-15.3-13.1,15.3-17.6l22.7-1.1c0,0,47.6-47.6,70.3-54.9s264.5-95.2,264.5-95.2
+                            s169.3-85,183.5-61.1c0,0-25.6,1.7-33,6.8c0,0,90.9-35.2,113.6-35.2s223.4,161.9,223.4,161.9l7.4,78.6c0,0-22.7,11.4-22.7,21.6
+                            c0,0-87.5-16.5-120.5-20.5s-81.3-1.5-81.3-1.5l-102.2-5.1L329.5,290l-100,19.3l-108.9-3.7c0,0-19.1,12.4-24.2,12.4
+                            c-5.1,0-15.3-21.6-15.3-21.6L71.8,290.9z" fill="#ff8000" />
+                            <path class="car-wing" d="M223.9,217.1c-19.2,5.5-56.7,40.5-93.3,56.2S71.8,290.9,71.8,290.9l8.2,5.7c0,0,15.6,17.6,21.6,12.5
+                            c0,0,102.2-1.7,161.3-25.6S329.5,258,329.5,258L223.9,217.1z" fill="#ff8000" />
+                            <circle class="wheel" cx="220" cy="300" r="32" fill="#1f1f1f" />
+                            <circle class="wheel" cx="700" cy="300" r="32" fill="#1f1f1f" />
+                        </svg>
+                        <div class="team-name">McLaren</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Add racing line effects to race cards
+        addRacingLineEffects();
+
+        // The CSS animations now handle the car animations automatically
+        // No need for the animateHeaderCars function
+    });
+</script>
+{% endblock %}
