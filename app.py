@@ -6,7 +6,6 @@ from config import Config
 from models import db, User, Race, FavoriteRace
 from auth import login_manager, register_user, login_user_with_supabase, logout_from_supabase
 from utils import load_races_data, load_race_results, load_fastest_laps, load_pit_stops, load_grid_positions
-from utils import import_all_yaml_data
 
 
 def create_app(config_class=Config):
@@ -35,15 +34,11 @@ def create_app(config_class=Config):
     # Create database tables
     with app.app_context():
         db.create_all()
-        # Load race data if DB is empty
-        from models import Race
-        if Race.query.count() == 0:
-            print("Importing YAML data...")
-            races_folder = app.config['RACES_FOLDER']
-            if os.path.exists(races_folder):
-                load_races_data(races_folder)
+        # Load race data
+        races_folder = app.config['RACES_FOLDER']
+        if os.path.exists(races_folder):
+            load_races_data(races_folder)
 
-    # Register routes
     @app.route('/')
     def home():
         """
