@@ -261,6 +261,14 @@ def create_app(config_class=Config):
     def internal_server_error(e):
         return render_template('errors/500.html'), 500
     
+    # Auto-import race data if DB is empty
+    @app.before_first_request
+    def load_data_if_needed():
+        if Race.query.count() == 0:
+            print("Importing YAML data...")
+            races_folder = app.config['RACES_FOLDER']
+            load_races_data(races_folder)
+
     return app
 
 if __name__ == '__main__':
