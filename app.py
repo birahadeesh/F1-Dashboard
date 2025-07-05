@@ -35,19 +35,15 @@ def create_app(config_class=Config):
     # Create database tables
     with app.app_context():
         db.create_all()
-        # Load race data
-        races_folder = app.config['RACES_FOLDER']
-        if os.path.exists(races_folder):
-            load_races_data(races_folder)
-
-    # Register routes
-    @app.before_first_request
-    def load_data_if_empty():
+        # Load race data if DB is empty
         from models import Race
         if Race.query.count() == 0:
-            print("⚙️ No race data found. Importing YAMLs...")
-            import_all_yaml_data()  # from utils.py
+            print("Importing YAML data...")
+            races_folder = app.config['RACES_FOLDER']
+            if os.path.exists(races_folder):
+                load_races_data(races_folder)
 
+    # Register routes
     @app.route('/')
     def home():
         """
