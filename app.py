@@ -41,6 +41,12 @@ def create_app(config_class=Config):
             load_races_data(races_folder)
 
     # Register routes
+    @app.before_first_request
+    def load_data_if_empty():
+        from models import Race
+        if Race.query.count() == 0:
+            print("⚙️ No race data found. Importing YAMLs...")
+            import_all_yaml_data()  # from utils.py
 
     @app.route('/')
     def home():
@@ -191,13 +197,6 @@ def create_app(config_class=Config):
                 flash(message, 'danger')
 
         return render_template('reset_password.html')
-
-    @app.before_first_request
-    def load_data_if_empty():
-        from models import Race
-        if Race.query.count() == 0:
-            print("⚙️ No race data found. Importing YAMLs...")
-            import_all_yaml_data()  # from utils.py
 
     @app.route('/race/<int:race_id>')
     @login_required
