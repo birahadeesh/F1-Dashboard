@@ -267,6 +267,7 @@ def create_app(config_class=Config):
     # Auto-import race data if DB is empty
     @app.before_first_request
     def load_data_if_needed():
+        from models import Race
         if Race.query.count() == 0:
             print("Importing YAML data...")
             races_folder = app.config['RACES_FOLDER']
