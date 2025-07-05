@@ -33,11 +33,6 @@ def create_app(config_class=Config):
     # Create database tables
     with app.app_context():
         db.create_all()
-        # --- Force reload of race data for debugging ---
-        from models import Race
-        Race.query.delete()
-        db.session.commit()
-        # --- End force reload ---
         # Load race data
         races_folder = app.config['RACES_FOLDER']
         if os.path.exists(races_folder):
