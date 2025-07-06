@@ -5,7 +5,7 @@ from models import Race, db
 
 
 def load_races_data(races_folder):
-    """Load races data from the races folder and populate the database, avoiding duplicates by (race_number, name, date)."""
+    """Load races data from the races folder and populate the database, avoiding duplicates by folder_name."""
     import datetime
     races = []
 
@@ -23,9 +23,8 @@ def load_races_data(races_folder):
             # Try to infer the date from the folder name (optional, fallback to None)
             race_date = None
             # Check for a YAML file with a date, or use a mapping if available (not implemented here)
-            # Check if race already exists in the database by (race_number, name, date)
-            existing_race = Race.query.filter_by(
-                race_number=race_number, name=race_name).first()
+            # Check if race already exists in the database by folder_name (which has UNIQUE constraint)
+            existing_race = Race.query.filter_by(folder_name=item).first()
             if not existing_race:
                 # Create new race entry
                 race = Race(
