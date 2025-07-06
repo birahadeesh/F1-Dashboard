@@ -1,0 +1,10 @@
+# Ignore Python cache
+__pycache__/
+*.py[cod]
+
+# Ignore environment variables
+.env
+
+# Ignore OS metadata
+.DS_Store
+Thumbs.db
