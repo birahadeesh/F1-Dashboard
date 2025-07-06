@@ -6,6 +6,7 @@ from config import Config
 from models import db, User, Race, FavoriteRace
 from auth import login_manager, register_user, login_user_with_supabase, logout_from_supabase
 from utils import load_races_data, load_race_results, load_fastest_laps, load_pit_stops, load_grid_positions
+from utils import import_all_yaml_data
 
 
 def create_app(config_class=Config):
@@ -261,6 +262,13 @@ def create_app(config_class=Config):
     @app.errorhandler(500)
     def internal_server_error(e):
         return render_template('errors/500.html'), 500
+
+    @app.before_first_request
+    def load_data_if_needed():
+        from models import Race
+        if Race.query.count() == 0:
+            print("⚙️ No race data found. Importing YAMLs...")
+            import_all_yaml_data()
 
     return app
 
