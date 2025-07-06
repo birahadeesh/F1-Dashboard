@@ -1,7 +1,9 @@
 import os
+from unittest import result
 import yaml
 import re
 from models import Race, db
+from utils import import_all_yaml_data
 
 
 def load_races_data(races_folder):
@@ -78,3 +80,71 @@ def load_grid_positions(race_folder):
         with open(grid_file, 'r') as f:
             return yaml.safe_load(f)
     return []
+
+
+def import_all_yaml_data():
+    races_dir = os.path.join(os.path.dirname(__file__), 'races')
+    load_races_data(races_dir)
+
+    for race in Race.query.all():
+        folder_path = os.path.join(races_dir, race.folder_name)
+
+        # Race Results
+        results = load_race_results(folder_path)
+        for entry in results:
+            driver = driver.query.filter_by(name=entry['driver']).first()
+            if not driver:
+                driver = driver(name=entry['driver'])
+                db.session.add(driver)
+
+            team = team.query.filter_by(name=entry['team']).first()
+            if not team:
+                team = team(name=entry['team'])
+                db.session.add(team)
+
+            db.session.add(load_race_results(
+                race_id=race.id,
+                driver=driver,
+                team=team,
+                position=entry.get('position'),
+                laps=entry.get('laps'),
+                time_retired=entry.get('time_retired'),
+                points=entry.get('points')
+            ))
+
+        # Fastest Laps
+        laps = load_fastest_laps(folder_path)
+        for lap in laps:
+            driver = driver.query.filter_by(name=lap['driver']).first()
+            team = team.query.filter_by(name=lap['team']).first()
+            db.session.add(load_fastest_laps(
+                race_id=race.id,
+                driver=driver,
+                team=team,
+                lap_time=lap.get('lap_time'),
+                lap_number=lap.get('lap_number')
+            ))
+
+        # Pit Stops
+        stops = load_pit_stops(folder_path)
+        for stop in stops:
+            driver = driver.query.filter_by(name=stop['driver']).first()
+            db.session.add(load_pit_stops(
+                race_id=race.id,
+                driver=driver,
+                stop_number=stop.get('stop_number'),
+                lap=stop.get('lap'),
+                time=stop.get('time')
+            ))
+
+        # Grid Positions
+        grid = load_grid_positions(folder_path)
+        for pos in grid:
+            driver = driver.query.filter_by(name=pos['driver']).first()
+            db.session.add(load_grid_positions(
+                race_id=race.id,
+                driver=driver,
+                position=pos.get('position')
+            ))
+
+    db.session.commit()
