@@ -19,43 +19,21 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand"
-                href="{{ url_for('dashboard') if current_user.is_authenticated else url_for('home') }}">
+            <a class="navbar-brand" href="{{ url_for('dashboard') }}">
                 <i class="fas fa-flag-checkered me-2"></i>F1 Dashboard
             </a>
+
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    {% if current_user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('dashboard') }}">
                             <i class="fas fa-home me-1"></i> Home
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('my_favorites') }}">
-                            <i class="fas fa-star me-1"></i> My Favorites
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('logout') }}">
-                            <i class="fas fa-sign-out-alt me-1"></i> Logout
-                        </a>
-                    </li>
-                    {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('login') }}">
-                            <i class="fas fa-sign-in-alt me-1"></i> Login
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('register') }}">
-                            <i class="fas fa-user-plus me-1"></i> Register
-                        </a>
-                    </li>
-                    {% endif %}
+
                 </ul>
             </div>
         </div>
@@ -83,7 +61,7 @@
     <!-- Footer -->
     <footer class="bg-dark text-white py-4 mt-5">
         <div class="container text-center">
-            <p>&copy; 2024 F1 Race Data Dashboard</p>
+            <p>&copy; 2026 F1 Race Data Dashboard</p>
         </div>
     </footer>
 

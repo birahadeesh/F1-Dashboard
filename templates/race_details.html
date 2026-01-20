@@ -15,15 +15,7 @@
             <div class="spoiler"></div>
         </div>
     </div>
-    {% if current_user.is_authenticated %}
-    <form action="{{ url_for('toggle_favorite', race_id=race.id) }}" method="POST" class="favorite-form">
-        {% set is_favorite = race.id in current_user.favorite_races|map(attribute='race_id')|list %}
-        <button type="submit" class="btn btn-outline-{{ 'danger' if is_favorite else 'secondary' }}">
-            <i class="fas fa-star me-1"></i>
-            {% if is_favorite %}Remove from Favorites{% else %}Add to Favorites{% endif %}
-        </button>
-    </form>
-    {% endif %}
+
 </div>
 
 <div class="finish-line mb-4"></div>
@@ -205,52 +197,28 @@
 
 {% block scripts %}
 <script>
-    // AJAX for favorite toggle if user is authenticated
-    document.addEventListener('DOMContentLoaded', function () {
-        const favoriteForm = document.querySelector('.favorite-form');
-        if (favoriteForm) {
-            favoriteForm.addEventListener('submit', function (e) {
-                e.preventDefault();
-                fetch(favoriteForm.action, {
-                    method: 'POST',
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        const btn = favoriteForm.querySelector('button');
-                        if (data.status === 'added') {
-                            btn.classList.remove('btn-outline-secondary');
-                            btn.classList.add('btn-outline-danger');
-                            btn.innerHTML = '<i class="fas fa-star me-1"></i> Remove from Favorites';
-                        } else {
-                            btn.classList.remove('btn-outline-danger');
-                            btn.classList.add('btn-outline-secondary');
-                            btn.innerHTML = '<i class="fas fa-star me-1"></i> Add to Favorites';
-                        }
-                    });
-            });
-        }
 
-        // Show loading animation when switching tabs
-        const tabEls = document.querySelectorAll('button[data-bs-toggle="tab"]');
-        tabEls.forEach(function (tabEl) {
-            tabEl.addEventListener('shown.bs.tab', function (event) {
-                const targetTab = document.querySelector(event.target.dataset.bsTarget);
-                if (targetTab) {
-                    const tableRows = targetTab.querySelectorAll('tbody tr');
-                    tableRows.forEach((row, index) => {
-                        row.style.opacity = 0;
-                        row.style.transform = 'translateY(10px)';
 
-                        setTimeout(() => {
-                            row.style.transition = 'all 0.3s ease';
-                            row.style.opacity = 1;
-                            row.style.transform = 'translateY(0)';
-                        }, 50 * index);
-                    });
-                }
-            });
+    // Show loading animation when switching tabs
+    const tabEls = document.querySelectorAll('button[data-bs-toggle="tab"]');
+    tabEls.forEach(function (tabEl) {
+        tabEl.addEventListener('shown.bs.tab', function (event) {
+            const targetTab = document.querySelector(event.target.dataset.bsTarget);
+            if (targetTab) {
+                const tableRows = targetTab.querySelectorAll('tbody tr');
+                tableRows.forEach((row, index) => {
+                    row.style.opacity = 0;
+                    row.style.transform = 'translateY(10px)';
+
+                    setTimeout(() => {
+                        row.style.transition = 'all 0.3s ease';
+                        row.style.opacity = 1;
+                        row.style.transform = 'translateY(0)';
+                    }, 50 * index);
+                });
+            }
         });
+    });
     });
 </script>
 {% endblock %}

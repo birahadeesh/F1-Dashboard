@@ -51,21 +51,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#about">About</a>
                     </li>
-                    {% if current_user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('dashboard') }}">My Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
-                    </li>
-                    {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link btn btn-login" href="{{ url_for('login') }}">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link btn btn-register" href="{{ url_for('register') }}">Register</a>
-                    </li>
-                    {% endif %}
+
                 </ul>
             </div>
         </div>
@@ -85,7 +71,7 @@
                     <h1 class="display-3 animated-title"><span class="highlight">F1</span> Dashboard</h1>
                     <p class="lead subtitle">Real-time race data, statistics, and insights for Formula 1 fans</p>
                     <div class="hero-buttons">
-                        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Get Started</a>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">Get Started</a>
                         <a href="#dashboard" class="btn btn-outline-light btn-lg">Explore Features</a>
                     </div>
                     <div class="scroll-down">
@@ -353,8 +339,7 @@
             <p class="lead">Join thousands of Formula 1 fans using F1 Dashboard to get deeper insights into the sport
                 they love.</p>
             <div class="cta-buttons">
-                <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Sign Up Now</a>
-                <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">Login</a>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">Go to Dashboard</a>
             </div>
         </div>
     </section>
@@ -410,7 +395,7 @@
             <div class="footer-bottom">
                 <div class="row">
                     <div class="col-md-6">
-                        <p>&copy; 2024 F1 Dashboard. All rights reserved.</p>
+                        <p>&copy; 2026 F1 Dashboard. All rights reserved.</p>
                     </div>
                     <div class="col-md-6 text-md-end">
                         <ul class="footer-bottom-links">
