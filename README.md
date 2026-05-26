@@ -1,73 +1,48 @@
 # F1 Race Data Dashboard
 
-An immersive Formula 1 data dashboard that visualizes 2024 race season stats using Flask, with local file import and a modern UI. The app pulls race data directly from a local races/ folder, presenting each event with detailed insights and engaging visuals.
+An immersive, multi-season Formula 1 data dashboard that visualizes race stats using Flask. The app seamlessly blends historical local data (2024) with live, auto-updating API data (2025 and 2026) to present each event with detailed insights, driver/constructor standings, and premium motorsport visuals.
 
 ## Features
 
-- **User Authentication**: Secure login and registration via Supabase
-- **Race Data Import**: Automatically loads race data from a local races/ folder
-- **Race Details**: Each race includes:
-  - Fastest laps
+- **Multi-Season Support**: Instantly switch between 2024, 2025, and 2026 championships.
+- **Live F1 Data**: Automatically fetches up-to-date schedules, standings, and race results via the Jolpica/Ergast F1 API.
+- **Comprehensive Race Details**: Each completed race includes:
   - Race results
+  - Fastest laps
   - Pit stops
-  - Starting grid positions
-- **Race Cards**: Overview cards with circuit information
-- **Favorites**: Save your favorite races for quick access
-- **Modern UI**: Dark mode with red highlights, responsive design, FontAwesome icons
+  - Starting grid/qualifying positions
+- **Premium F1 Theme**: A stunning dark-mode aesthetic featuring high-contrast tables, interactive hover glows, and accurate dynamic team colors (e.g., Ferrari red, McLaren orange).
+- **Offline Data Fallback**: The 2024 season runs completely locally using YAML-backed datasets, demonstrating local data ingestion architecture.
 
 ## Tech Stack
 
-- **Backend**: Flask, SQLAlchemy, SQLite
-- **Frontend**: HTML, CSS, Bootstrap 5, JavaScript
-- **Authentication**: Supabase
+- **Backend**: Python, Flask, SQLAlchemy, SQLite
+- **External Data API**: Jolpica F1 API (formerly Ergast)
+- **Frontend**: HTML5, CSS3, Bootstrap 5, Vanilla JavaScript
 
 ## Setup Instructions
 
 1. Clone the repository
-2. Install dependencies:
-   ```
+2. Install the required Python dependencies:
+   ```bash
    pip install -r requirements.txt
    ```
-3. Set up Supabase:
-   - Create a Supabase account at [supabase.io](https://supabase.io)
-   - Create a new project
-   - Enable Email Auth in Authentication -> Providers
-   - Get your Supabase URL and Anon Key from Project Settings -> API
-   - Update the `.env` file with your Supabase credentials
-
-4. Configure the environment variables:
-   - Update the `.env` file with your settings:
-     ```
-     SECRET_KEY=your_secret_key
-     DATABASE_URI=sqlite:///f1_dashboard.db
-     SUPABASE_URL=your_supabase_url
-     SUPABASE_KEY=your_supabase_anon_key
-     RACES_FOLDER=../races
-     ```
-
-5. Run the application:
+3. Configure your environment variables by creating a `.env` file in the root directory:
+   ```ini
+   SECRET_KEY=your_secure_secret_key
+   DATABASE_URI=sqlite:///f1_dashboard.db
+   RACES_FOLDER=races
    ```
+4. Run the application locally:
+   ```bash
    python app.py
    ```
+5. Open your browser and navigate to `http://127.0.0.1:5000`
 
-## Supabase Setup Guide
+## Local Data Structure (2024 Season)
 
-1. Go to [supabase.io](https://supabase.io) and create an account
-2. Create a new project with a name of your choice
-3. Navigate to Authentication -> Providers and ensure Email Auth is enabled
-4. Go to Project Settings -> API to find your:
-   - Project URL (e.g., https://xxxxxxxxxxxx.supabase.co)
-   - Project API Keys (use the `anon` `public` key)
-5. Update the `.env` file with these values:
-   ```
-   SUPABASE_URL=https://xxxxxxxxxxxx.supabase.co
-   SUPABASE_KEY=your_anon_public_key
-   ```
-
-## Data Structure
-
-The app expects race data in YAML format organized in folders named by race number and location:
-```
+While the 2025 and 2026 seasons pull live data from the web, the app expects 2024 race data in YAML format organized in folders named by race number and location:
+```text
 races/
 ├── 1 bahrain/
 │   ├── race-results.yml
@@ -80,4 +55,4 @@ races/
 
 ## License
 
-MIT 
+MIT

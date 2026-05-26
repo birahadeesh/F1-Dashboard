@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+{% block title %}{{ race_info.raceName }} — F1 {{ year }}{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{{ url_for('season_dashboard', year=year) }}" class="back-btn mb-3 d-inline-flex">
+        <i class="fas fa-arrow-left"></i> {{ year }} Season
+    </a>
+    <div class="f1-page-header">
+        <div class="race-detail-header">
+            <span class="race-num-badge">Round {{ round_num }}</span>
+            <h1 class="race-detail-title">{{ race_info.raceName }}</h1>
+        </div>
+        <div class="d-flex gap-4 mt-2 flex-wrap">
+            <span style="color:var(--f1-muted);font-size:.9rem;">
+                <i class="fas fa-map-marker-alt me-2" style="color:var(--f1-red)"></i>
+                {{ race_info.Circuit.circuitName if race_info.Circuit else '' }}
+            </span>
+            {% if race_info.Circuit %}
+            <span style="color:var(--f1-muted);font-size:.9rem;">
+                <i class="fas fa-globe me-2" style="color:var(--f1-red)"></i>
+                {{ race_info.Circuit.Location.locality }}, {{ race_info.Circuit.Location.country }}
+            </span>
+            {% endif %}
+            <span style="color:var(--f1-muted);font-size:.9rem;">
+                <i class="fas fa-calendar-alt me-2" style="color:var(--f1-red)"></i>
+                {{ race_info.date }}
+            </span>
+            <span style="color:var(--f1-muted);font-size:.9rem;">
+                <i class="fas fa-flag me-2" style="color:var(--f1-red)"></i>{{ year }} Formula 1 World Championship
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="racing-line mb-4"></div>
+
+<!-- Tabs -->
+<ul class="nav nav-tabs mb-0" id="raceDataTabs"
+    style="background:var(--f1-card-alt);border-radius:8px 8px 0 0;padding:0 8px;border:1px solid var(--f1-border);border-bottom:none;">
+    <li class="nav-item">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#results-pane">
+            <i class="fas fa-trophy me-1"></i>Results
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#fastest-pane">
+            <i class="fas fa-bolt me-1"></i>Fastest Laps
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#pit-pane">
+            <i class="fas fa-tools me-1"></i>Pit Stops
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#quali-pane">
+            <i class="fas fa-stopwatch me-1"></i>Qualifying
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content"
+     style="border:1px solid var(--f1-border);border-top:none;border-radius:0 0 8px 8px;overflow:hidden;">
+
+    <!-- Race Results -->
+    <div class="tab-pane fade show active" id="results-pane">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Pos</th><th>Driver</th><th>Team</th>
+                        <th>Laps</th><th>Time / Status</th><th>Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in results %}
+                    {% set con = r.Constructor.name if r.Constructor else '' %}
+                    {% set color = team_color(con) %}
+                    <tr>
+                        <td>{{ r.position }}</td>
+                        <td style="color:#e0e0f0;font-weight:600;">
+                            {{ r.Driver.givenName }} {{ r.Driver.familyName }}
+                        </td>
+                        <td style="color:{{ color }} !important;font-weight:700;">{{ con }}</td>
+                        <td>{{ r.laps }}</td>
+                        <td>
+                            {% if r.status not in ['Finished', '+1 Lap', '+2 Laps', '+3 Laps', '+4 Laps'] %}
+                            <span style="color:#ff6b6b;font-size:.85rem;">{{ r.status }}</span>
+                            {% else %}
+                            {{ r.Time.time if r.Time else r.status }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if r.points and r.points != '0' %}
+                            <span style="color:var(--f1-yellow);font-weight:700;">{{ r.points }}</span>
+                            {% else %}—{% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="text-center py-4" style="color:var(--f1-muted);">
+                        {% if year >= 2026 %}<i class="fas fa-clock me-2"></i>Race not yet held{% else %}No results available{% endif %}
+                    </td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Fastest Laps -->
+    <div class="tab-pane fade" id="fastest-pane">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr><th>Rank</th><th>Driver</th><th>Team</th><th>Lap</th><th>Time</th><th>Avg Speed</th></tr>
+                </thead>
+                <tbody>
+                    {% for lap in fastest_laps %}
+                    {% set color = team_color(lap.constructor) %}
+                    <tr>
+                        <td>{{ lap.position }}</td>
+                        <td style="color:#e0e0f0;font-weight:600;">{{ lap.driverName }}</td>
+                        <td style="color:{{ color }} !important;font-weight:700;">{{ lap.constructor }}</td>
+                        <td>{{ lap.lap }}</td>
+                        <td style="font-family:'Barlow Condensed',sans-serif;font-weight:700;color:var(--f1-green);">{{ lap.time }}</td>
+                        <td style="color:var(--f1-muted);">{{ lap.avgSpeed }} km/h</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="text-center py-4" style="color:var(--f1-muted);">No fastest lap data</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pit Stops -->
+    <div class="tab-pane fade" id="pit-pane">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr><th>Driver</th><th>Stop #</th><th>Lap</th><th>Time of Day</th><th>Duration</th></tr>
+                </thead>
+                <tbody>
+                    {% for stop in pit_stops %}
+                    <tr>
+                        <td style="color:#e0e0f0;font-weight:600;">{{ stop.driverId|replace('-',' ')|title }}</td>
+                        <td>{{ stop.stop }}</td>
+                        <td>{{ stop.lap }}</td>
+                        <td style="color:var(--f1-muted);">{{ stop.time }}</td>
+                        <td style="font-family:'Barlow Condensed',sans-serif;font-weight:700;color:#FF8000;">{{ stop.duration }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" class="text-center py-4" style="color:var(--f1-muted);">No pit stop data</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Qualifying -->
+    <div class="tab-pane fade" id="quali-pane">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr><th>Grid</th><th>Driver</th><th>Team</th><th>Q1</th><th>Q2</th><th>Q3</th></tr>
+                </thead>
+                <tbody>
+                    {% for q in qualifying %}
+                    {% set con = q.Constructor.name if q.Constructor else '' %}
+                    {% set color = team_color(con) %}
+                    <tr>
+                        <td>{{ q.position }}</td>
+                        <td style="color:#e0e0f0;font-weight:600;">
+                            {{ q.Driver.givenName }} {{ q.Driver.familyName }}
+                        </td>
+                        <td style="color:{{ color }} !important;font-weight:700;">{{ con }}</td>
+                        <td style="color:var(--f1-muted);">{{ q.Q1 or '—' }}</td>
+                        <td style="color:var(--f1-muted);">{{ q.Q2 or '—' }}</td>
+                        <td style="font-family:'Barlow Condensed',sans-serif;font-weight:700;color:var(--f1-green);">
+                            {{ q.Q3 or '—' }}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="text-center py-4" style="color:var(--f1-muted);">
+                        {% if year >= 2026 %}<i class="fas fa-clock me-2"></i>Not yet held{% else %}No qualifying data{% endif %}
+                    </td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.querySelectorAll('button[data-bs-toggle="tab"]').forEach(btn => {
+    btn.addEventListener('shown.bs.tab', e => {
+        const pane = document.querySelector(e.target.dataset.bsTarget);
+        if (!pane) return;
+        pane.querySelectorAll('tbody tr').forEach((row, i) => {
+            row.style.opacity = 0;
+            row.style.transform = 'translateY(8px)';
+            setTimeout(() => {
+                row.style.transition = 'all 0.2s ease';
+                row.style.opacity = 1;
+                row.style.transform = 'translateY(0)';
+            }, 35 * i);
+        });
+    });
+});
+</script>
+{% endblock %}

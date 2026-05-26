@@ -1,79 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}F1 Race Data Dashboard{% endblock %}</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
+    <title>{% block title %}F1 Dashboard{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Custom CSS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700;900&family=Barlow+Condensed:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
     {% block styles %}{% endblock %}
 </head>
+<body>
 
-<body class="{% if request.path == '/' %}homepage-body{% endif %}">
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url_for('home') }}">
-                <i class="fas fa-flag-checkered me-2"></i>F1 Dashboard
+<!-- Live Ticker -->
+<div class="race-ticker">
+    <div class="ticker-label"><i class="fas fa-satellite-dish me-1"></i> LIVE</div>
+    <div class="ticker-track">
+        <div class="ticker-content" id="tickerContent">
+            🏁 2025 F1 Season Underway &nbsp;|&nbsp;
+            🏆 WDC Leader: Oscar Piastri (McLaren) &nbsp;|&nbsp;
+            🏗️ WCC Leader: McLaren &nbsp;|&nbsp;
+            📅 Next Race: Monaco Grand Prix — May 25, 2025 &nbsp;|&nbsp;
+            🔥 Last Win: Lando Norris — Miami GP &nbsp;|&nbsp;
+            🔴 Ferrari: Leclerc hunting podiums &nbsp;|&nbsp;
+            💙 Mercedes: Russell strong in top 3 &nbsp;|&nbsp;
+            🏁 2025 F1 Season Underway &nbsp;|&nbsp;
+            🏆 WDC Leader: Oscar Piastri (McLaren) &nbsp;|&nbsp;
+            🏗️ WCC Leader: McLaren &nbsp;|&nbsp;
+            📅 Next Race: Monaco Grand Prix — May 25, 2025 &nbsp;|&nbsp;
+        </div>
+    </div>
+</div>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark f1-navbar">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand f1-brand" href="{{ url_for('home') }}">
+            <div class="brand-logo">
+                <span class="brand-f1">F1</span>
+                <div class="brand-divider"></div>
+                <span class="brand-dash">DASHBOARD</span>
+            </div>
+        </a>
+
+        <button class="navbar-toggler border-0" type="button"
+                data-bs-toggle="collapse" data-bs-target="#mainNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav me-auto align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link f1-nav-link {% if request.path == '/' %}active{% endif %}"
+                       href="{{ url_for('home') }}">
+                        <i class="fas fa-home me-1"></i>Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link f1-nav-link {% if '/season/' in request.path or '/dashboard' in request.path %}active{% endif %}"
+                       href="{{ url_for('season_dashboard', year=session.get('season', 2026)) }}">
+                        <i class="fas fa-flag-checkered me-1"></i>Races
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Season Selector -->
+            <div class="season-selector-nav d-flex align-items-center gap-2 me-3">
+                <span class="season-label">Season</span>
+                {% set current_year = session.get('season', 2026) %}
+                {% for yr in [2024, 2025, 2026] %}
+                <a href="{{ url_for('season_dashboard', year=yr) }}"
+                   class="season-pill {% if current_year == yr %}active{% endif %}">
+                    {{ yr }}
+                </a>
+                {% endfor %}
+            </div>
+
+            <a href="{{ url_for('dashboard') }}" class="btn btn-f1-red btn-sm px-3">
+                <i class="fas fa-tachometer-alt me-1"></i>Dashboard
             </a>
+        </div>
+    </div>
+</nav>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('home') }}">
-                            <i class="fas fa-home me-1"></i> Home
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('dashboard') }}">
-                            <i class="fas fa-tachometer-alt me-1"></i> Dashboard
-                        </a>
-                    </li>
-                </ul>
+<!-- Flash messages -->
+<div class="container-fluid px-4 mt-3">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible fade show f1-alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+</div>
+
+<!-- Content -->
+<main class="container-fluid px-4 my-4">
+    {% block content %}{% endblock %}
+</main>
+
+<!-- Footer -->
+<footer class="f1-footer">
+    <div class="footer-stripe"></div>
+    <div class="container py-4">
+        <div class="row align-items-center">
+            <div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
+                <div class="footer-brand-text">
+                    <span class="f1-red-text fw-black">F1</span>
+                    <span class="text-white ms-2">DASHBOARD</span>
+                </div>
+                <p class="text-muted small mt-1 mb-0">Multi-Season Formula 1 Analytics</p>
+            </div>
+            <div class="col-md-4 text-center mb-3 mb-md-0">
+                <div class="footer-seasons">
+                    {% for yr in [2024, 2025, 2026] %}
+                    <a href="{{ url_for('season_dashboard', year=yr) }}" class="footer-season-link">{{ yr }}</a>
+                    {% endfor %}
+                </div>
+                <p class="text-muted small mt-2 mb-0">&copy; {{ now().year }} F1 Dashboard</p>
+            </div>
+            <div class="col-md-4 text-center text-md-end">
+                <p class="text-muted small mb-0">Data: Jolpica API &amp; Local YAML</p>
+                <p class="text-muted small mb-0">Not affiliated with Formula 1 or FIA</p>
             </div>
         </div>
-    </nav>
-
-    <!-- Flash Messages -->
-    <div class="container mt-3">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        {% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        {% endfor %}
-        {% endif %}
-        {% endwith %}
     </div>
+</footer>
 
-    <!-- Main Content -->
-    <main class="container my-4">
-        {% block content %}{% endblock %}
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-dark text-white py-4 mt-5">
-        <div class="container text-center">
-            <p>&copy; 2026 F1 Race Data Dashboard</p>
-        </div>
-    </footer>
-
-    <!-- Bootstrap JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JS -->
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    {% block scripts %}{% endblock %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block scripts %}{% endblock %}
 </body>
-
 </html>

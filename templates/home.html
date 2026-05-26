@@ -4,414 +4,426 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>F1 Dashboard - Live Race Data & Statistics</title>
+    <title>F1 Dashboard — 2025 Season</title>
     <meta name="description"
-        content="Real-time Formula 1 race data, statistics, and standings. Track your favorite drivers and teams throughout the F1 season.">
-
-    <!-- Favicon -->
+        content="The ultimate Formula 1 fan dashboard. Live standings, 2025 race calendar, driver stats and race data.">
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/f1-logo.jpg') }}" type="image/x-icon">
-
-    <!-- CSS Files -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
-
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700;900&family=Barlow+Condensed:wght@400;600;700;800;900&display=swap"
         rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
 </head>
 
 <body>
-    <!-- Navigation Bar -->
-    <nav class="home-navbar navbar navbar-expand-lg fixed-top">
+
+    <!-- Ticker -->
+    <div class="race-ticker-home"
+        style="background:#E8002D;height:34px;display:flex;align-items:center;overflow:hidden;position:fixed;top:0;left:0;right:0;z-index:1100;">
+        <div
+            style="background:#000;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.1em;padding:0 14px;height:100%;display:flex;align-items:center;white-space:nowrap;flex-shrink:0;border-right:2px solid #E8002D;">
+            <i class="fas fa-flag-checkered me-1"></i> F1 2025
+        </div>
+        <div style="flex:1;overflow:hidden;display:flex;align-items:center;">
+            <div class="ticker-content"
+                style="display:inline-block;white-space:nowrap;font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:600;letter-spacing:.04em;color:#fff;animation:ticker-scroll 40s linear infinite;padding-left:100%;">
+                🏁 WDC LEADER: Oscar Piastri — McLaren &nbsp;|&nbsp; 🏗️ WCC LEADER: McLaren &nbsp;|&nbsp; 🔥 Bahrain GP
+                Winner: Lando Norris &nbsp;|&nbsp; 🇸🇦 Saudi Arabia GP Winner: Lando Norris &nbsp;|&nbsp; 🇦🇺
+                Australian GP Winner: George Russell &nbsp;|&nbsp; 🇯🇵 Japanese GP Winner: Max Verstappen &nbsp;|&nbsp;
+                🇨🇳 Chinese GP Winner: Oscar Piastri &nbsp;|&nbsp; 📅 NEXT: Miami GP — May 4, 2025 &nbsp;|&nbsp; 🏁 WDC
+                LEADER: Oscar Piastri — McLaren &nbsp;|&nbsp; 🏗️ WCC LEADER: McLaren &nbsp;|&nbsp;
+            </div>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="home-navbar navbar navbar-expand-lg navbar-dark" style="margin-top:34px;">
         <div class="container">
-            <a class="navbar-brand" href="#">
-                <img src="{{ url_for('static', filename='img/f1-logo.jpg') }}" alt="F1 Dashboard Logo" class="logo">
-                <span>F1 Dashboard</span>
+            <a class="navbar-brand" href="#" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+                <span
+                    style="background:#E8002D;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:800;padding:2px 10px;border-radius:4px;letter-spacing:.05em;">F1</span>
+                <span
+                    style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;color:#fff;letter-spacing:.12em;">DASHBOARD</span>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#homeNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#hero">Home</a>
+            <div class="collapse navbar-collapse" id="homeNav">
+                <ul class="navbar-nav ms-auto align-items-center gap-1">
+                    <li class="nav-item"><a class="nav-link active" href="#hero">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#standings">Standings</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#calendar">Calendar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+                    <li class="nav-item ms-2">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-sm px-4">
+                            <i class="fas fa-flag-checkered me-1"></i> Race Data
+                        </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#dashboard">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#circuits">Circuits</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#standings">Standings</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#about">About</a>
-                    </li>
-
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
+    <!-- HERO -->
     <section id="hero" class="hero-section">
-        <div class="video-background">
-            <video autoplay muted loop>
-                <source src="{{ url_for('static', filename='img/f1-car-silhouette.jpg') }}" type="image/jpeg">
-            </video>
-            <div class="overlay"></div>
-        </div>
-        <div class="container hero-content">
-            <div class="row align-items-center">
-                <div class="col-lg-8 mx-auto text-center">
-                    <h1 class="display-3 animated-title"><span class="highlight">F1</span> Dashboard</h1>
-                    <p class="lead subtitle">Real-time race data, statistics, and insights for Formula 1 fans</p>
-                    <div class="hero-buttons">
-                        <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">Get Started</a>
-                        <a href="#dashboard" class="btn btn-outline-light btn-lg">Explore Features</a>
-                    </div>
-                    <div class="scroll-down">
-                        <a href="#dashboard"><i class="fas fa-chevron-down"></i></a>
-                    </div>
-                </div>
+        <div class="hero-bg"></div>
+        <div class="hero-grid"></div>
+        <div class="hero-glow"></div>
+        <div class="hero-content container">
+            <div class="hero-eyebrow">
+                <span class="pulse-dot"></span>
+                2025 Formula 1 Season — Live
             </div>
+            <h1 class="hero-title">
+                <span class="f1-word">Formula</span>
+                <span class="dash-word">One Hub</span>
+            </h1>
+            <p class="hero-subtitle">Real-time race data, championship standings, lap records and performance stats for
+                every true F1 fan.</p>
+            <div class="hero-cta">
+                <a href="{{ url_for('dashboard') }}" class="btn-hero-primary">
+                    <i class="fas fa-flag-checkered"></i> Explore Races
+                </a>
+                <a href="#standings" class="btn-hero-outline">
+                    <i class="fas fa-trophy"></i> 2025 Standings
+                </a>
+            </div>
+        </div>
+        <div class="hero-scroll">
+            <i class="fas fa-chevron-down"></i>
+            <span>Scroll</span>
         </div>
     </section>
 
-    <!-- Dashboard Preview Section -->
-    <section id="dashboard" class="dashboard-section">
+    <!-- STATS BAR -->
+    <div class="stats-bar">
         <div class="container">
-            <div class="section-header text-center">
-                <h2>Your Formula 1 Command Center</h2>
-                <p class="lead">Access live race data, track your favorite drivers, and analyze performance metrics</p>
-            </div>
-
-            <div class="row preview-cards">
-                <div class="col-md-4">
-                    <div class="preview-card">
-                        <div class="card-icon">
-                            <i class="fas fa-tachometer-alt"></i>
-                        </div>
-                        <h3>Live Race Data</h3>
-                        <p>Follow every lap with real-time telemetry, position changes, and pitstop strategies.</p>
+            <div class="row text-center g-0">
+                <div class="col-6 col-md-3">
+                    <div class="stat-item">
+                        <div class="stat-val"><span>24</span></div>
+                        <div class="stat-label">Races in 2025</div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="preview-card">
-                        <div class="card-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <h3>Performance Analytics</h3>
-                        <p>Analyze driver and team performance with comprehensive metrics and historical comparisons.
-                        </p>
+                <div class="col-6 col-md-3">
+                    <div class="stat-item">
+                        <div class="stat-val"><span>20</span></div>
+                        <div class="stat-label">Drivers on Grid</div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="preview-card">
-                        <div class="card-icon">
-                            <i class="fas fa-trophy"></i>
-                        </div>
-                        <h3>Championship Tracking</h3>
-                        <p>Keep track of driver and constructor standings throughout the season with visual charts.</p>
+                <div class="col-6 col-md-3">
+                    <div class="stat-item">
+                        <div class="stat-val"><span>10</span></div>
+                        <div class="stat-label">Constructors</div>
                     </div>
                 </div>
-            </div>
-
-            <div class="dashboard-image text-center">
-                <img src="{{ url_for('static', filename='img/f1-car-silhouette.jpg') }}" alt="F1 Dashboard Preview"
-                    class="img-fluid rounded">
-                <div class="pit-stop-lights">
-                    <div class="pit-light"></div>
-                    <div class="pit-light"></div>
-                    <div class="pit-light"></div>
-                    <div class="pit-light"></div>
-                    <div class="pit-light"></div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-item">
+                        <div class="stat-val"><span>5</span></div>
+                        <div class="stat-label">Races Completed</div>
+                    </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Circuits Section -->
-    <section id="circuits" class="circuits-section">
-        <div class="container">
-            <div class="section-header text-center">
-                <h2>2024 F1 Grand Prix Calendar</h2>
-                <p class="lead">Explore this season's race circuits and schedules</p>
-            </div>
-
-            <div class="circuit-carousel">
-                <div id="circuitCarousel" class="carousel">
-                    <div class="carousel-inner">
-                        <div class="carousel-item">
-                            <div class="circuit">
-                                <div class="circuit-image">
-                                    <img src="{{ url_for('static', filename='img/circuits/bahrain.jpg') }}"
-                                        alt="Bahrain International Circuit">
-                                </div>
-                                <div class="circuit-info">
-                                    <h3>Bahrain Grand Prix</h3>
-                                    <p class="circuit-date">March 2, 2024</p>
-                                    <p class="circuit-details">Sakhir, Bahrain</p>
-                                    <a href="#" class="btn btn-sm btn-outline-primary">Circuit Details</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="carousel-item">
-                            <div class="circuit">
-                                <div class="circuit-image">
-                                    <img src="{{ url_for('static', filename='img/circuits/jeddah.jpg') }}"
-                                        alt="Jeddah Corniche Circuit">
-                                </div>
-                                <div class="circuit-info">
-                                    <h3>Saudi Arabian Grand Prix</h3>
-                                    <p class="circuit-date">March 9, 2024</p>
-                                    <p class="circuit-details">Jeddah, Saudi Arabia</p>
-                                    <a href="#" class="btn btn-sm btn-outline-primary">Circuit Details</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="carousel-item">
-                            <div class="circuit">
-                                <div class="circuit-image">
-                                    <img src="{{ url_for('static', filename='img/circuits/melbourne.jpg') }}"
-                                        alt="Albert Park Circuit">
-                                </div>
-                                <div class="circuit-info">
-                                    <h3>Australian Grand Prix</h3>
-                                    <p class="circuit-date">March 24, 2024</p>
-                                    <p class="circuit-details">Melbourne, Australia</p>
-                                    <a href="#" class="btn btn-sm btn-outline-primary">Circuit Details</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <button class="carousel-control-prev" type="button">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    </button>
-                    <button class="carousel-control-next" type="button">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="text-center mt-4">
-                <a href="{{ url_for('dashboard') }}" class="btn btn-primary">View Races</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Standings Section -->
+    <!-- STANDINGS -->
     <section id="standings" class="standings-section">
         <div class="container">
-            <div class="section-header text-center">
-                <h2>Current Standings</h2>
-                <p class="lead">2024 Season Driver and Constructor Standings</p>
+            <div class="text-center mb-5 reveal">
+                <div class="section-label">2025 Championship</div>
+                <h2 class="section-title">Current <span>Standings</span></h2>
+                <p class="section-sub mx-auto">Live driver & constructor championship standings after 5 rounds of the
+                    2025 Formula 1 season.</p>
             </div>
+            <div class="standings-tabs-wrapper reveal">
+                <div class="s-tab-btns">
+                    <button class="s-tab-btn active" onclick="switchTab('drivers',this)">Drivers</button>
+                    <button class="s-tab-btn" onclick="switchTab('constructors',this)">Constructors</button>
+                </div>
 
-            <div class="row standings-tabs">
-                <div class="col-12">
-                    <ul class="nav nav-tabs" id="standingsTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="drivers-tab" data-bs-toggle="tab"
-                                data-bs-target="#drivers-standings" type="button" role="tab">Drivers</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="constructors-tab" data-bs-toggle="tab"
-                                data-bs-target="#constructors-standings" type="button" role="tab">Constructors</button>
-                        </li>
-                    </ul>
+                <!-- DRIVERS -->
+                <div id="tab-drivers" class="s-tab-content active">
+                    <div class="standings-table">
+                        <div class="st-header">
+                            <div>#</div>
+                            <div>Driver</div>
+                            <div>Team</div>
+                            <div style="text-align:right">PTS</div>
+                        </div>
+                        {% set drivers2025 = [
+                        ('Oscar Piastri','🇦🇺','McLaren','#FF8000',169),
+                        ('Lando Norris','🇬🇧','McLaren','#FF8000',152),
+                        ('George Russell','🇬🇧','Mercedes','#27F4D2',124),
+                        ('Charles Leclerc','🇲🇨','Ferrari','#E8002D',102),
+                        ('Max Verstappen','🇳🇱','Red Bull','#3671C6',95),
+                        ('Carlos Sainz','🇪🇸','Williams','#64C4FF',82),
+                        ('Lewis Hamilton','🇬🇧','Ferrari','#E8002D',76),
+                        ('Kimi Antonelli','🇮🇹','Mercedes','#27F4D2',58),
+                        ('Fernando Alonso','🇪🇸','Aston Martin','#229971',42),
+                        ('Lance Stroll','🇨🇦','Aston Martin','#229971',28)
+                        ] %}
+                        {% for name,flag,team,color,pts in drivers2025 %}
+                        <div class="st-row">
+                            <div class="st-pos {% if loop.index <= 3 %}top3{% endif %}">{{ loop.index }}</div>
+                            <div class="st-driver">
+                                <div class="driver-bar" style="background:{{color}}"></div>
+                                <span class="driver-flag">{{flag}}</span>
+                                <span class="driver-name">{{ name }}</span>
+                            </div>
+                            <div class="st-team">{{ team }}</div>
+                            <div class="st-points">{{ pts }}<span class="st-points-label">pts</span></div>
+                        </div>
+                        {% endfor %}
+                        <a href="{{ url_for('dashboard') }}" class="view-more-btn">View Full Race Data <i
+                                class="fas fa-arrow-right ms-1"></i></a>
+                    </div>
+                </div>
 
-                    <div class="tab-content standings-content" id="standingsTabContent">
-                        <div class="tab-pane fade show active" id="drivers-standings" role="tabpanel">
-                            <div class="standings-table">
-                                <div class="standings-header">
-                                    <div class="pos">#</div>
-                                    <div class="driver">Driver</div>
-                                    <div class="team">Team</div>
-                                    <div class="points">Points</div>
+                <!-- CONSTRUCTORS -->
+                <div id="tab-constructors" class="s-tab-content">
+                    <div class="standings-table">
+                        <div class="st-header constructors">
+                            <div>#</div>
+                            <div>Constructor</div>
+                            <div style="text-align:right">PTS</div>
+                        </div>
+                        {% set constructors2025 = [
+                        ('McLaren','#FF8000','🟠',321),
+                        ('Ferrari','#E8002D','🔴',178),
+                        ('Mercedes','#27F4D2','🩵',182),
+                        ('Red Bull Racing','#3671C6','🔵',95),
+                        ('Williams','#64C4FF','💙',99),
+                        ('Aston Martin','#229971','🟢',70),
+                        ('Alpine','#FF87BC','🩷',38),
+                        ('Haas','#B6BABD','⚪',28),
+                        ('RB','#6692FF','🔷',18),
+                        ('Kick Sauber','#52E252','🟩',4)
+                        ] %}
+                        {% for name,color,icon,pts in constructors2025 %}
+                        <div class="st-row constructors">
+                            <div class="st-pos {% if loop.index <= 3 %}top3{% endif %}">{{ loop.index }}</div>
+                            <div class="st-driver">
+                                <div class="driver-bar" style="background:{{color}}"></div>
+                                <span class="driver-flag">{{icon}}</span>
+                                <span class="driver-name">{{ name }}</span>
+                            </div>
+                            <div class="st-points">{{ pts }}<span class="st-points-label">pts</span></div>
+                        </div>
+                        {% endfor %}
+                        <a href="{{ url_for('dashboard') }}" class="view-more-btn">View Full Race Data <i
+                                class="fas fa-arrow-right ms-1"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CALENDAR -->
+    <section id="calendar" class="calendar-section">
+        <div class="container">
+            <div class="text-center mb-5 reveal">
+                <div class="section-label">Schedule</div>
+                <h2 class="section-title">2025 Race <span>Calendar</span></h2>
+                <p class="section-sub mx-auto">All 24 Grand Prix events of the 2025 Formula 1 World Championship.</p>
+            </div>
+            <div class="race-calendar reveal">
+                {% set cal = [
+                (1,'🇧🇭','Bahrain Grand Prix','Mar 16','done'),
+                (2,'🇸🇦','Saudi Arabian Grand Prix','Mar 23','done'),
+                (3,'🇦🇺','Australian Grand Prix','Mar 30','done'),
+                (4,'🇯🇵','Japanese Grand Prix','Apr 6','done'),
+                (5,'🇨🇳','Chinese Grand Prix','Apr 20','done'),
+                (6,'🇺🇸','Miami Grand Prix','May 4','next'),
+                (7,'🇮🇹','Emilia Romagna Grand Prix','May 18','upcoming'),
+                (8,'🇲🇨','Monaco Grand Prix','May 25','upcoming'),
+                (9,'🇪🇸','Spanish Grand Prix','Jun 1','upcoming'),
+                (10,'🇨🇦','Canadian Grand Prix','Jun 15','upcoming'),
+                (11,'🇦🇹','Austrian Grand Prix','Jun 29','upcoming'),
+                (12,'🇬🇧','British Grand Prix','Jul 6','upcoming'),
+                (13,'🇧🇪','Belgian Grand Prix','Jul 27','upcoming'),
+                (14,'🇭🇺','Hungarian Grand Prix','Aug 3','upcoming'),
+                (15,'🇳🇱','Dutch Grand Prix','Aug 31','upcoming'),
+                (16,'🇮🇹','Italian Grand Prix','Sep 7','upcoming'),
+                (17,'🇦🇿','Azerbaijan Grand Prix','Sep 21','upcoming'),
+                (18,'🇸🇬','Singapore Grand Prix','Oct 5','upcoming'),
+                (19,'🇺🇸','United States Grand Prix','Oct 19','upcoming'),
+                (20,'🇲🇽','Mexico City Grand Prix','Oct 26','upcoming'),
+                (21,'🇧🇷','São Paulo Grand Prix','Nov 9','upcoming'),
+                (22,'🇺🇸','Las Vegas Grand Prix','Nov 22','upcoming'),
+                (23,'🇶🇦','Qatar Grand Prix','Nov 30','upcoming'),
+                (24,'🇦🇪','Abu Dhabi Grand Prix','Dec 7','upcoming')
+                ] %}
+                {% for num,flag,name,date,status in cal %}
+                <div class="cal-card {% if status == 'done' %}completed{% elif status == 'next' %}next-race{% endif %}">
+                    <div class="cal-flag">{{ flag }}</div>
+                    <div class="cal-info">
+                        <div class="cal-round">Round {{ num }}</div>
+                        <div class="cal-name">{{ name }}</div>
+                        <div class="cal-date"><i class="fas fa-calendar-alt me-1"
+                                style="color:#E8002D;font-size:.75rem;"></i>{{ date }}, 2025</div>
+                    </div>
+                    <div class="cal-status-dot {% if status == 'done' %}done{% elif status == 'next' %}next{% endif %}">
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features" class="features-section">
+        <div class="container">
+            <div class="row align-items-center mb-5">
+                <div class="col-lg-5 reveal">
+                    <div class="section-label">What We Offer</div>
+                    <h2 class="section-title">Your F1 <span>Command Center</span></h2>
+                    <p class="section-sub">Everything a Formula 1 fan needs — race results, lap times, pit stop data,
+                        qualifying grids and much more.</p>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary mt-3">
+                        <i class="fas fa-flag-checkered me-2"></i>Explore All Races
+                    </a>
+                </div>
+                <div class="col-lg-7 mt-4 mt-lg-0">
+                    <div class="row g-3">
+                        {% set features = [
+                        ('fas fa-trophy','Race Results','Full podium & points results for every Grand Prix in the
+                        season.','#E8002D'),
+                        ('fas fa-bolt','Fastest Laps','Lap-by-lap timing data and fastest lap records per
+                        driver.','#FF8000'),
+                        ('fas fa-tools','Pit Stop Strategy','Detailed pit stop timing and strategy data for every
+                        race.','#27F4D2'),
+                        ('fas fa-th','Starting Grids','Qualifying results and grid positions for every race
+                        weekend.','#3671C6'),
+                        ('fas fa-chart-line','Season Standings','Live 2025 WDC and WCC standings updated each
+                        race.','#229971'),
+                        ('fas fa-map-marker-alt','24 Circuits','Data spanning all 24 circuits on the 2025 F1
+                        calendar.','#FF87BC')
+                        ] %}
+                        {% for icon,title,desc,color in features %}
+                        <div class="col-sm-6 reveal">
+                            <div class="feature-card" style="--accent:{{color}}">
+                                <div class="feature-icon"
+                                    style="background:{{color}}18;border-color:{{color}}33;color:{{color}}">
+                                    <i class="{{ icon }}"></i>
                                 </div>
-
-                                {% for i in range(5) %}
-                                <div class="standings-row">
-                                    <div class="pos">{{ i + 1 }}</div>
-                                    <div class="driver">
-                                        <div class="driver-color"
-                                            style="background-color: {{ ['#00E2FF', '#ED1C24', '#FF8700', '#27F4D2', '#6CD3BF'][i] }};">
-                                        </div>
-                                        <span>{{ ['Max Verstappen', 'Lewis Hamilton', 'Charles Leclerc', 'Sergio Perez',
-                                            'George Russell'][i] }}</span>
-                                    </div>
-                                    <div class="team">{{ ['Red Bull Racing', 'Mercedes', 'Ferrari', 'Red Bull Racing',
-                                        'Mercedes'][i] }}</div>
-                                    <div class="points">{{ [249, 156, 149, 146, 122][i] }}</div>
-                                </div>
-                                {% endfor %}
-
-                                <div class="text-center mt-3">
-                                    <a href="{{ url_for('dashboard') }}" class="btn btn-sm btn-primary">View Races</a>
-                                </div>
+                                <h3>{{ title }}</h3>
+                                <p>{{ desc }}</p>
                             </div>
                         </div>
-
-                        <div class="tab-pane fade" id="constructors-standings" role="tabpanel">
-                            <div class="standings-table">
-                                <div class="standings-header">
-                                    <div class="pos">#</div>
-                                    <div class="team wide-team">Team</div>
-                                    <div class="points">Points</div>
-                                </div>
-
-                                {% for i in range(5) %}
-                                <div class="standings-row">
-                                    <div class="pos">{{ i + 1 }}</div>
-                                    <div class="team wide-team">
-                                        <div class="team-color"
-                                            style="background-color: {{ ['#0600EF', '#F91536', '#6CD3BF', '#FF8700', '#005AFF'][i] }};">
-                                        </div>
-                                        <span>{{ ['Red Bull Racing', 'Ferrari', 'Mercedes', 'McLaren', 'Alpine'][i]
-                                            }}</span>
-                                    </div>
-                                    <div class="points">{{ [395, 297, 289, 111, 58][i] }}</div>
-                                </div>
-                                {% endfor %}
-
-                                <div class="text-center mt-3">
-                                    <a href="{{ url_for('dashboard') }}" class="btn btn-sm btn-primary">View Races</a>
-                                </div>
-                            </div>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- About Section -->
-    <section id="about" class="about-section">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6 about-content">
-                    <h2>About F1 Dashboard</h2>
-                    <p class="lead">Your ultimate Formula 1 companion for the 2024 season and beyond.</p>
-                    <p>F1 Dashboard provides fans with comprehensive race data, historical statistics, and real-time
-                        insights. Whether you're tracking your favorite driver's performance or analyzing team
-                        strategies, our platform gives you the data you need to enhance your F1 experience.</p>
-                    <p>Built by F1 enthusiasts for F1 enthusiasts, our goal is to provide the most comprehensive and
-                        user-friendly Formula 1 data experience available.</p>
-                    <div class="feature-list">
-                        <div class="feature-item">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Real-time race data</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Detailed driver and team statistics</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Historical race comparisons</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Personalized dashboards</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6 about-image">
-                    <div class="image-container">
-                        <img src="{{ url_for('static', filename='img/f1-car-silhouette.jpg') }}" alt="Formula 1 Car"
-                            class="img-fluid f1-car-animation">
-                        <div class="dots-overlay"></div>
-                    </div>
-                </div>
-            </div>
+    <!-- CTA -->
+    <section class="cta-section text-center">
+        <div class="container reveal">
+            <h2 class="cta-title">Ready to <span>Go Flat Out?</span></h2>
+            <p class="cta-sub mx-auto">Dive into every race, every lap, every strategy decision from the 2025 Formula 1
+                season.</p>
+            <a href="{{ url_for('dashboard') }}" class="btn-hero-primary">
+                <i class="fas fa-flag-checkered"></i> Enter the Dashboard
+            </a>
         </div>
     </section>
 
-    <!-- Call to Action -->
-    <section class="cta-section">
-        <div class="container text-center">
-            <h2>Ready to Enhance Your F1 Experience?</h2>
-            <p class="lead">Join thousands of Formula 1 fans using F1 Dashboard to get deeper insights into the sport
-                they love.</p>
-            <div class="cta-buttons">
-                <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">Go to Dashboard</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 col-md-6">
-                    <div class="footer-brand">
-                        <img src="{{ url_for('static', filename='img/f1-white-logo.jpg') }}" alt="F1 Dashboard Logo"
-                            class="footer-logo">
-                        <h3>F1 Dashboard</h3>
-                    </div>
-                    <p>The ultimate Formula 1 data companion</p>
-                    <div class="social-icons">
-                        <a href="#" target="_blank"><i class="fab fa-twitter"></i></a>
-                        <a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
-                        <a href="#" target="_blank"><i class="fab fa-youtube"></i></a>
+    <!-- FOOTER -->
+    <footer class="home-footer">
+        <div class="footer-top-stripe"></div>
+        <div class="container py-5">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="footer-brand-name"><span>F1</span> Dashboard</div>
+                    <p class="footer-tagline">The ultimate Formula 1 data hub for fans worldwide.</p>
+                    <div class="social-row">
+                        <a class="social-btn" href="#" target="_blank"><i class="fab fa-twitter"></i></a>
+                        <a class="social-btn" href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+                        <a class="social-btn" href="#" target="_blank"><i class="fab fa-youtube"></i></a>
+                        <a class="social-btn" href="#" target="_blank"><i class="fab fa-reddit-alien"></i></a>
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-6">
-                    <h4>Quick Links</h4>
-                    <ul class="footer-links">
+                <div class="col-6 col-lg-2">
+                    <div class="footer-section-title">Navigate</div>
+                    <ul class="footer-nav">
                         <li><a href="#hero">Home</a></li>
-                        <li><a href="#dashboard">Dashboard</a></li>
-                        <li><a href="#circuits">Circuits</a></li>
                         <li><a href="#standings">Standings</a></li>
-                        <li><a href="#about">About</a></li>
+                        <li><a href="#calendar">Calendar</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="{{ url_for('dashboard') }}">Race Data</a></li>
                     </ul>
                 </div>
-                <div class="col-lg-2 col-md-6">
-                    <h4>Resources</h4>
-                    <ul class="footer-links">
-                        <li><a href="#">API Documentation</a></li>
-                        <li><a href="#">Data Sources</a></li>
-                        <li><a href="#">Developer Tools</a></li>
-                        <li><a href="#">User Guides</a></li>
+                <div class="col-6 col-lg-2">
+                    <div class="footer-section-title">2025 Teams</div>
+                    <ul class="footer-nav">
+                        <li><a href="#">McLaren</a></li>
+                        <li><a href="#">Ferrari</a></li>
+                        <li><a href="#">Mercedes</a></li>
+                        <li><a href="#">Red Bull</a></li>
+                        <li><a href="#">Aston Martin</a></li>
                     </ul>
                 </div>
-                <div class="col-lg-4 col-md-6">
-                    <h4>Subscribe to Our Newsletter</h4>
-                    <p>Get the latest F1 news and updates delivered to your inbox</p>
-                    <form class="newsletter-form">
-                        <div class="input-group">
-                            <input type="email" class="form-control" placeholder="Your Email Address" required>
-                            <button class="btn btn-primary" type="submit">Subscribe</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <div class="row">
-                    <div class="col-md-6">
-                        <p>&copy; 2026 F1 Dashboard. All rights reserved.</p>
-                    </div>
-                    <div class="col-md-6 text-md-end">
-                        <ul class="footer-bottom-links">
-                            <li><a href="#">Privacy Policy</a></li>
-                            <li><a href="#">Terms of Service</a></li>
-                            <li><a href="#">Cookie Policy</a></li>
-                        </ul>
+                <div class="col-lg-4">
+                    <div class="footer-section-title">F1 Newsletter</div>
+                    <p style="color:var(--f1-muted);font-size:.88rem;">Get race previews and results straight to your
+                        inbox.</p>
+                    <div class="newsletter-input-row">
+                        <input type="email" placeholder="your@email.com">
+                        <button type="button">Subscribe</button>
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="team-colors-bar">
+                <div class="tc-bar" style="background:#E8002D"></div>
+                <div class="tc-bar" style="background:#FF8000"></div>
+                <div class="tc-bar" style="background:#27F4D2"></div>
+                <div class="tc-bar" style="background:#3671C6"></div>
+                <div class="tc-bar" style="background:#229971"></div>
+                <div class="tc-bar" style="background:#FF87BC"></div>
+                <div class="tc-bar" style="background:#64C4FF"></div>
+                <div class="tc-bar" style="background:#B6BABD"></div>
+                <div class="tc-bar" style="background:#6692FF"></div>
+                <div class="tc-bar" style="background:#52E252"></div>
+            </div>
+            &copy; 2025 F1 Dashboard. All rights reserved. &nbsp;|&nbsp; Data sourced from Ergast API &amp; F1 Official.
         </div>
     </footer>
 
-    <!-- JavaScript Files -->
+    <style>
+        @keyframes ticker-scroll {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+    </style>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='js/home.js') }}"></script>
+    <script>
+        function switchTab(tab, btn) {
+            document.querySelectorAll('.s-tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.s-tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            btn.classList.add('active');
+        }
+        // Scroll reveal
+        const revealEls = document.querySelectorAll('.reveal');
+        const revealObs = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in-view'); revealObs.unobserve(e.target); } });
+        }, { threshold: 0.1 });
+        revealEls.forEach(el => revealObs.observe(el));
+    </script>
 </body>
 
 </html>

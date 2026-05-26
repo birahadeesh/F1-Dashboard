@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+{% block title %}F1 {{ year }} Season Dashboard{% endblock %}
+
+{% block content %}
+
+<!-- Season Header -->
+<div class="f1-page-header mb-4">
+    <div class="d-flex align-items-start justify-content-between flex-wrap gap-3">
+        <div>
+            <div class="d-flex align-items-center gap-3 mb-1">
+                <h1 class="mb-0">
+                    <i class="fas fa-flag-checkered me-2" style="color:var(--f1-red)"></i>
+                    {{ year }} Season
+                </h1>
+                <span class="season-badge">F1 {{ year }}</span>
+                {% if year == 2026 %}
+                <span class="upcoming-badge">UPCOMING</span>
+                {% endif %}
+            </div>
+            <p class="subtitle mb-0">
+                {% if use_local %}
+                {{ races|length }} Grand Prix events — Local race data
+                {% else %}
+                {{ schedule|length }} Grand Prix events — Live API data
+                <span class="ms-2" style="color:var(--f1-green);font-size:.75rem;">
+                    <i class="fas fa-circle me-1" style="font-size:.5rem;vertical-align:middle;"></i>Updated
+                    automatically
+                </span>
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- Season Switcher Buttons -->
+        <div class="d-flex align-items-center gap-2">
+            {% for yr in supported_seasons %}
+            <a href="{{ url_for('season_dashboard', year=yr) }}"
+                class="btn btn-season {% if yr == year %}active{% endif %}">
+                {{ yr }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="racing-line mb-4"></div>
+
+<!-- ── STANDINGS PANEL ───────────────────────────────────────────────────── -->
+{% if driver_standings or constructor_standings %}
+<div class="row g-3 mb-4">
+    <!-- Driver Standings -->
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5><i class="fas fa-user me-2"></i>Driver Standings</h5>
+                <span
+                    style="font-size:.72rem;color:var(--f1-muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:.08em;">TOP
+                    5</span>
+            </div>
+            <div class="card-body p-0">
+                {% for ds in driver_standings[:5] %}
+                {% set drv = ds.Driver %}
+                {% set pos = ds.position|int %}
+                {% set con = ds.Constructors[0].name if ds.Constructors else '' %}
+                {% set color = team_color(con) %}
+                <div class="standing-row {% if loop.first %}standing-row-leader{% endif %}">
+                    <div class="standing-pos {% if pos <= 3 %}gold{% endif %}">{{ pos }}</div>
+                    <div class="standing-bar" style="background:{{ color }}"></div>
+                    <div class="standing-info">
+                        <div class="standing-name">{{ drv.givenName }} {{ drv.familyName }}</div>
+                        <div class="standing-team" style="color:{{ color }}">{{ con }}</div>
+                    </div>
+                    <div class="standing-pts">
+                        {{ ds.points }}
+                        <span class="pts-label">PTS</span>
+                    </div>
+                </div>
+                {% else %}
+                <div class="p-4 text-center" style="color:var(--f1-muted);">
+                    <i class="fas fa-spinner fa-spin me-2"></i>Loading standings…
+                </div>
+                {% endfor %}
+                <div class="standing-footer">
+                    <a href="/api/standings/{{ year }}" target="_blank" class="standing-footer-link">
+                        Full standings JSON <i class="fas fa-external-link-alt ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Constructor Standings -->
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5><i class="fas fa-users me-2"></i>Constructor Standings</h5>
+                <span
+                    style="font-size:.72rem;color:var(--f1-muted);font-family:'Barlow Condensed',sans-serif;letter-spacing:.08em;">TOP
+                    5</span>
+            </div>
+            <div class="card-body p-0">
+                {% for cs in constructor_standings[:5] %}
+                {% set con = cs.Constructor %}
+                {% set pos = cs.position|int %}
+                {% set color = team_color(con.name) %}
+                <div class="standing-row {% if loop.first %}standing-row-leader{% endif %}">
+                    <div class="standing-pos {% if pos <= 3 %}gold{% endif %}">{{ pos }}</div>
+                    <div class="standing-bar" style="background:{{ color }}"></div>
+                    <div class="standing-info">
+                        <div class="standing-name">{{ con.name }}</div>
+                        <div class="standing-team">{{ cs.wins }} win{% if cs.wins != '1' %}s{% endif %}</div>
+                    </div>
+                    <div class="standing-pts">
+                        {{ cs.points }}
+                        <span class="pts-label">PTS</span>
+                    </div>
+                </div>
+                {% else %}
+                <div class="p-4 text-center" style="color:var(--f1-muted);">
+                    <i class="fas fa-spinner fa-spin me-2"></i>Loading standings…
+                </div>
+                {% endfor %}
+                <div class="standing-footer">
+                    <a href="/api/standings/{{ year }}" target="_blank" class="standing-footer-link">
+                        Full standings JSON <i class="fas fa-external-link-alt ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- ── RACE CALENDAR ──────────────────────────────────────────────────────── -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <h5><i class="fas fa-calendar-alt me-2"></i>{{ year }} Grand Prix Calendar</h5>
+        <div class="d-flex align-items-center gap-2">
+            {% if use_local %}
+            <div class="dropdown">
+                <button class="btn btn-outline-light btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="fas fa-sort me-1"></i>
+                    {% if sort_by == 'name' %}Name{% else %}Round{% endif %}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item {% if sort_by == 'race_number' %}active{% endif %}"
+                            href="{{ url_for('season_dashboard', year=year, sort='race_number') }}">
+                            <i class="fas fa-hashtag me-2"></i>Round</a></li>
+                    <li><a class="dropdown-item {% if sort_by == 'name' %}active{% endif %}"
+                            href="{{ url_for('season_dashboard', year=year, sort='name') }}">
+                            <i class="fas fa-sort-alpha-down me-2"></i>Name</a></li>
+                </ul>
+            </div>
+            {% endif %}
+            <span class="badge-count">
+                {% if use_local %}{{ races|length }}{% else %}{{ schedule|length }}{% endif %} RACES
+            </span>
+        </div>
+    </div>
+
+    <div class="card-body p-3">
+        <!-- ── RACE CARDS (cinematic) ── -->
+        {% if use_local %}
+        <!-- 2024 LOCAL RACES -->
+        <div class="row g-3 race-cards-container">
+            {% for race in races %}
+            {% set ci = get_card_image(race.name, '') %}
+            <div class="col-md-4 col-xl-3">
+                <div class="f1-race-card" style="animation-delay:{{ loop.index0 * 0.04 }}s">
+                    <!-- Visual Header -->
+                    <div class="f1-card-visual">
+                        <img src="{{ ci.img_path }}" alt="{{ race.name }}" class="f1-card-bg-img" loading="lazy"
+                            onerror="this.src='/static/img/races/f1_default.jpg'">
+                        <div class="f1-card-overlay"></div>
+                        <div class="f1-card-red-glow"></div>
+                        <div class="f1-card-round">R{{ race.race_number }}</div>
+                        <div class="f1-card-season">{{ race.season }}</div>
+                        <div class="f1-card-bottom">
+                            <div class="f1-card-flag">{{ ci.flag }}</div>
+                            <div class="f1-card-race-name">{{ race.name }}</div>
+                        </div>
+                    </div>
+                    <!-- Info Footer -->
+                    <div class="f1-card-info">
+                        <div class="f1-card-meta">
+                            <span><i class="fas fa-map-marker-alt"></i> {{ race.circuit_name }}</span>
+                            <span><i class="fas fa-calendar-alt"></i>
+                                {% if race.date %}{{ race.date.strftime('%b %d, %Y') }}
+                                {% else %}Date TBA{% endif %}
+                            </span>
+                        </div>
+                        <a href="{{ url_for('race_details', race_id=race.id) }}" class="f1-card-btn">
+                            <i class="fas fa-chart-bar me-1"></i>Race Data
+                            <i class="fas fa-arrow-right ms-auto"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% else %}
+        <!-- API-BACKED RACES (2025/2026) -->
+        <div class="row g-3 race-cards-container">
+            {% for race in schedule %}
+            {% set rdate = race.date %}
+            {% set rname = race.raceName %}
+            {% set round = race.round|int %}
+            {% set circuit = race.Circuit %}
+            {% set locality = circuit.Location.locality if circuit else '' %}
+            {% set country = circuit.Location.country if circuit else '' %}
+            {% set ci = get_card_image(rname, country) %}
+            {% set winner = '' %}
+            {% if race.Results is defined and race.Results %}
+            {% set winner = race.Results[0].Driver.familyName %}
+            {% endif %}
+
+            <div class="col-md-4 col-xl-3">
+                <div class="f1-race-card" style="animation-delay:{{ loop.index0 * 0.04 }}s">
+                    <div class="f1-card-visual">
+                        <img src="{{ ci.img_path }}" alt="{{ rname }}" class="f1-card-bg-img" loading="lazy"
+                            onerror="this.src='/static/img/races/f1_default.jpg'">
+                        <div class="f1-card-overlay"></div>
+                        <div class="f1-card-red-glow"></div>
+                        <div class="f1-card-round">R{{ round }}</div>
+                        <div class="f1-card-season">{{ year }}</div>
+                        <div class="f1-card-bottom">
+                            <div class="f1-card-flag">{{ ci.flag }}</div>
+                            <div class="f1-card-race-name">{{ rname }}</div>
+                        </div>
+                    </div>
+                    <div class="f1-card-info">
+                        <div class="f1-card-meta">
+                            <span><i class="fas fa-map-marker-alt"></i> {{ locality }}, {{ country }}</span>
+                            <span><i class="fas fa-calendar-alt"></i> {{ rdate or 'TBA' }}</span>
+                            {% if winner %}
+                            <span style="color:var(--f1-yellow);font-weight:700;">
+                                <i class="fas fa-trophy"></i> {{ winner }}
+                            </span>
+                            {% endif %}
+                        </div>
+                        <a href="{{ url_for('api_race_details', year=year, round_num=round) }}" class="f1-card-btn">
+                            <i class="fas fa-chart-bar me-1"></i>Race Data
+                            <i class="fas fa-arrow-right ms-auto"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Team Legend -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h5><i class="fas fa-palette me-2"></i>{{ year }} Team Colours</h5>
+    </div>
+    <div class="card-body py-3">
+        <div class="d-flex flex-wrap gap-3">
+            {% set teams_2024 = [
+            ('McLaren','#FF8000'),('Ferrari','#E8002D'),('Red Bull','#3671C6'),
+            ('Mercedes','#27F4D2'),('Aston Martin','#229971'),('Alpine','#FF87BC'),
+            ('Williams','#64C4FF'),('Haas','#B6BABD'),('RB','#6692FF'),('Alfa Romeo','#B12335')
+            ] %}
+            {% set teams_2025 = [
+            ('McLaren','#FF8000'),('Ferrari','#E8002D'),('Mercedes','#27F4D2'),
+            ('Red Bull','#3671C6'),('Aston Martin','#229971'),('Alpine','#FF87BC'),
+            ('Williams','#64C4FF'),('Haas','#B6BABD'),('RB','#6692FF'),('Kick Sauber','#52E252')
+            ] %}
+            {% set teams = teams_2024 if year == 2024 else teams_2025 %}
+            {% for tname, tcolor in teams %}
+            <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:14px;height:14px;border-radius:3px;background:{{tcolor}};flex-shrink:0;"></div>
+                <span
+                    style="font-family:'Barlow Condensed',sans-serif;font-size:.88rem;font-weight:600;color:var(--f1-muted);">{{
+                    tname }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Animate cards on load
+    document.querySelectorAll('.race-card').forEach(c => c.classList.add('animate-in'));
+</script>
+{% endblock %}

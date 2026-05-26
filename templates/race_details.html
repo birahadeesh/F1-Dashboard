@@ -1,224 +1,220 @@
 {% extends "base.html" %}
-
-{% block title %}{{ race.name }} - F1 Race Data Dashboard{% endblock %}
+{% block title %}{{ race.name }} — F1 {{ year }} Data{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div class="d-flex align-items-center">
-        <h2 class="me-3">
-            <span class="badge bg-danger me-2">{{ race.race_number }}</span>
-            {{ race.name }}
-        </h2>
-        <div class="f1-car-css f1-car-moving d-none d-md-block">
-            <div class="wheel"></div>
-            <div class="wheel"></div>
-            <div class="spoiler"></div>
+<!-- Back + Header -->
+<div class="mb-4">
+    <a href="{{ url_for('dashboard') }}" class="back-btn mb-3 d-inline-flex">
+        <i class="fas fa-arrow-left"></i> All Races
+    </a>
+    <div class="f1-page-header">
+        <div class="race-detail-header">
+            <span class="race-num-badge">Round {{ race.race_number }}</span>
+            <h1 class="race-detail-title">{{ race.name }}</h1>
+        </div>
+        <div class="d-flex gap-4 mt-2 flex-wrap">
+            <span style="color:var(--f1-muted);font-size:.9rem;">
+                <i class="fas fa-map-marker-alt me-2" style="color:var(--f1-red)"></i>{{ race.circuit_name }}
+            </span>
+            {% if race.date %}
+            <span style="color:var(--f1-muted);font-size:.9rem;">
+                <i class="fas fa-calendar-alt me-2" style="color:var(--f1-red)"></i>{{ race.date.strftime('%B %d, %Y') }}
+            </span>
+            {% endif %}
+            <span style="color:var(--f1-muted);font-size:.9rem;">
+                <i class="fas fa-flag me-2" style="color:var(--f1-red)"></i>{{ year }} Formula 1 World Championship
+            </span>
         </div>
     </div>
-
 </div>
 
-<div class="finish-line mb-4"></div>
+<div class="racing-line mb-4"></div>
 
-<ul class="nav nav-tabs mb-4" id="raceDataTabs" role="tablist">
+<!-- Tabs -->
+<ul class="nav nav-tabs mb-0" id="raceDataTabs" role="tablist"
+    style="background:var(--f1-card-alt);border-radius:8px 8px 0 0;padding:0 8px;border:1px solid var(--f1-border);border-bottom:none;">
     <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="results-tab" data-bs-toggle="tab" data-bs-target="#results-tab-pane"
-            type="button" role="tab">
-            <i class="fas fa-trophy me-1"></i> Race Results
+        <button class="nav-link active" id="results-tab" data-bs-toggle="tab"
+            data-bs-target="#results-tab-pane" type="button" role="tab">
+            <i class="fas fa-trophy me-1"></i> Results
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="fastest-laps-tab" data-bs-toggle="tab" data-bs-target="#fastest-laps-tab-pane"
-            type="button" role="tab">
+        <button class="nav-link" id="fastest-laps-tab" data-bs-toggle="tab"
+            data-bs-target="#fastest-laps-tab-pane" type="button" role="tab">
             <i class="fas fa-bolt me-1"></i> Fastest Laps
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="pit-stops-tab" data-bs-toggle="tab" data-bs-target="#pit-stops-tab-pane"
-            type="button" role="tab">
+        <button class="nav-link" id="pit-stops-tab" data-bs-toggle="tab"
+            data-bs-target="#pit-stops-tab-pane" type="button" role="tab">
             <i class="fas fa-tools me-1"></i> Pit Stops
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="grid-tab" data-bs-toggle="tab" data-bs-target="#grid-tab-pane" type="button"
-            role="tab">
+        <button class="nav-link" id="grid-tab" data-bs-toggle="tab"
+            data-bs-target="#grid-tab-pane" type="button" role="tab">
             <i class="fas fa-th me-1"></i> Starting Grid
         </button>
     </li>
 </ul>
 
-<div class="tab-content" id="raceDataTabsContent">
-    <!-- Race Results Tab -->
-    <div class="tab-pane fade show active" id="results-tab-pane" role="tabpanel" aria-labelledby="results-tab"
-        tabindex="0">
-        <div class="card">
-            <div class="card-header bg-dark text-white">
-                <h5 class="mb-0">Race Results</h5>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-striped table-hover mb-0">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Pos</th>
-                            <th>Driver</th>
-                            <th>Team</th>
-                            <th>Laps</th>
-                            <th>Time/Retired</th>
-                            <th>Points</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for result in results %}
-                        <tr>
-                            <td>{{ result.position }}</td>
-                            <td>{{ result.driverId|replace('-', ' ')|title }}</td>
-                            <td data-team="{{ result.constructorId }}">{{ result.constructorId|replace('-', ' ')|title
-                                }}</td>
-                            <td>{{ result.laps }}</td>
-                            <td>
-                                {% if result.reasonRetired %}
-                                {{ result.reasonRetired }}
-                                {% else %}
-                                {{ result.time or result.gap }}
-                                {% endif %}
-                            </td>
-                            <td>{{ result.points or '-' }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+<div class="tab-content" id="raceDataTabsContent"
+    style="border:1px solid var(--f1-border);border-top:none;border-radius:0 0 8px 8px;overflow:hidden;">
+
+    <!-- Race Results -->
+    <div class="tab-pane fade show active" id="results-tab-pane" role="tabpanel">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Pos</th>
+                        <th>Driver</th>
+                        <th>Team</th>
+                        <th>Laps</th>
+                        <th>Time / Status</th>
+                        <th>Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in results %}
+                    <tr>
+                        <td>{{ result.position }}</td>
+                        <td style="color:#e0e0f0;font-weight:600;">{{ result.driverId|replace('-',' ')|title }}</td>
+                        <td data-team="{{ result.constructorId }}">{{ result.constructorId|replace('-',' ')|title }}</td>
+                        <td>{{ result.laps }}</td>
+                        <td>
+                            {% if result.reasonRetired %}
+                            <span style="color:#ff6b6b;font-size:.85rem;">{{ result.reasonRetired }}</span>
+                            {% else %}
+                            {{ result.time or result.gap }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if result.points and result.points != '0' %}
+                            <span style="color:var(--f1-yellow);font-weight:700;">{{ result.points }}</span>
+                            {% else %}—{% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="text-center py-4" style="color:var(--f1-muted);">No results data available</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <!-- Fastest Laps Tab -->
-    <div class="tab-pane fade" id="fastest-laps-tab-pane" role="tabpanel" aria-labelledby="fastest-laps-tab"
-        tabindex="0">
-        <div class="card">
-            <div class="card-header bg-dark text-white">
-                <h5 class="mb-0">Fastest Laps</h5>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-striped table-hover mb-0">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Pos</th>
-                            <th>Driver</th>
-                            <th>Team</th>
-                            <th>Lap</th>
-                            <th>Time</th>
-                            <th>Gap</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for lap in fastest_laps %}
-                        <tr>
-                            <td>{{ lap.position }}</td>
-                            <td>{{ lap.driverId|replace('-', ' ')|title }}</td>
-                            <td data-team="{{ lap.constructorId }}">{{ lap.constructorId|replace('-', ' ')|title }}</td>
-                            <td>{{ lap.lap }}</td>
-                            <td>{{ lap.time }}</td>
-                            <td>{{ lap.gap or '-' }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+    <!-- Fastest Laps -->
+    <div class="tab-pane fade" id="fastest-laps-tab-pane" role="tabpanel">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Pos</th>
+                        <th>Driver</th>
+                        <th>Team</th>
+                        <th>Lap</th>
+                        <th>Time</th>
+                        <th>Gap</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lap in fastest_laps %}
+                    <tr>
+                        <td>{{ lap.position }}</td>
+                        <td style="color:#e0e0f0;font-weight:600;">{{ lap.driverId|replace('-',' ')|title }}</td>
+                        <td data-team="{{ lap.constructorId }}">{{ lap.constructorId|replace('-',' ')|title }}</td>
+                        <td>{{ lap.lap }}</td>
+                        <td style="font-family:'Barlow Condensed',sans-serif;font-weight:700;color:var(--f1-green);">{{ lap.time }}</td>
+                        <td style="color:var(--f1-muted);">{{ lap.gap or '—' }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="text-center py-4" style="color:var(--f1-muted);">No fastest lap data available</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <!-- Pit Stops Tab -->
-    <div class="tab-pane fade" id="pit-stops-tab-pane" role="tabpanel" aria-labelledby="pit-stops-tab" tabindex="0">
-        <div class="card">
-            <div class="card-header bg-dark text-white">
-                <h5 class="mb-0">Pit Stops</h5>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-striped table-hover mb-0">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Driver</th>
-                            <th>Stop</th>
-                            <th>Lap</th>
-                            <th>Time</th>
-                            <th>Duration</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for stop in pit_stops %}
-                        <tr>
-                            <td>{{ stop.driverId|replace('-', ' ')|title }}</td>
-                            <td>{{ stop.stop }}</td>
-                            <td>{{ stop.lap }}</td>
-                            <td>{{ stop.time }}</td>
-                            <td>{{ stop.duration }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+    <!-- Pit Stops -->
+    <div class="tab-pane fade" id="pit-stops-tab-pane" role="tabpanel">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Driver</th>
+                        <th>Stop #</th>
+                        <th>Lap</th>
+                        <th>Time of Day</th>
+                        <th>Duration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stop in pit_stops %}
+                    <tr>
+                        <td style="color:#e0e0f0;font-weight:600;">{{ stop.driverId|replace('-',' ')|title }}</td>
+                        <td>{{ stop.stop }}</td>
+                        <td>{{ stop.lap }}</td>
+                        <td style="color:var(--f1-muted);">{{ stop.time }}</td>
+                        <td style="font-family:'Barlow Condensed',sans-serif;font-weight:700;color:#FF8000;">{{ stop.duration }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" class="text-center py-4" style="color:var(--f1-muted);">No pit stop data available</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <!-- Starting Grid Tab -->
-    <div class="tab-pane fade" id="grid-tab-pane" role="tabpanel" aria-labelledby="grid-tab" tabindex="0">
-        <div class="card">
-            <div class="card-header bg-dark text-white">
-                <h5 class="mb-0">Starting Grid</h5>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-striped table-hover mb-0">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Pos</th>
-                            <th>Driver</th>
-                            <th>Team</th>
-                            <th>Time</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for pos in grid_positions %}
-                        <tr>
-                            <td>{{ pos.position }}</td>
-                            <td>{{ pos.driverId|replace('-', ' ')|title }}</td>
-                            <td data-team="{{ pos.constructorId }}">{{ pos.constructorId|replace('-', ' ')|title }}</td>
-                            <td>{{ pos.q3 or pos.q2 or pos.q1 or '-' }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+    <!-- Starting Grid -->
+    <div class="tab-pane fade" id="grid-tab-pane" role="tabpanel">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Grid</th>
+                        <th>Driver</th>
+                        <th>Team</th>
+                        <th>Qualifying Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pos in grid_positions %}
+                    <tr>
+                        <td>{{ pos.position }}</td>
+                        <td style="color:#e0e0f0;font-weight:600;">{{ pos.driverId|replace('-',' ')|title }}</td>
+                        <td data-team="{{ pos.constructorId }}">{{ pos.constructorId|replace('-',' ')|title }}</td>
+                        <td style="font-family:'Barlow Condensed',sans-serif;font-weight:700;color:var(--f1-green);">
+                            {{ pos.q3 or pos.q2 or pos.q1 or '—' }}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="4" class="text-center py-4" style="color:var(--f1-muted);">No grid data available</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
-
-<div class="mt-4 speedometer"></div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-
-
-    // Show loading animation when switching tabs
-    const tabEls = document.querySelectorAll('button[data-bs-toggle="tab"]');
-    tabEls.forEach(function (tabEl) {
-        tabEl.addEventListener('shown.bs.tab', function (event) {
-            const targetTab = document.querySelector(event.target.dataset.bsTarget);
-            if (targetTab) {
-                const tableRows = targetTab.querySelectorAll('tbody tr');
-                tableRows.forEach((row, index) => {
-                    row.style.opacity = 0;
-                    row.style.transform = 'translateY(10px)';
-
-                    setTimeout(() => {
-                        row.style.transition = 'all 0.3s ease';
-                        row.style.opacity = 1;
-                        row.style.transform = 'translateY(0)';
-                    }, 50 * index);
-                });
-            }
+const tabEls = document.querySelectorAll('button[data-bs-toggle="tab"]');
+tabEls.forEach(tabEl => {
+    tabEl.addEventListener('shown.bs.tab', e => {
+        const target = document.querySelector(e.target.dataset.bsTarget);
+        if (!target) return;
+        target.querySelectorAll('tbody tr').forEach((row, i) => {
+            row.style.opacity = 0;
+            row.style.transform = 'translateY(8px)';
+            setTimeout(() => {
+                row.style.transition = 'all 0.25s ease';
+                row.style.opacity = 1;
+                row.style.transform = 'translateY(0)';
+            }, 40 * i);
         });
     });
-    });
+});
 </script>
 {% endblock %}
